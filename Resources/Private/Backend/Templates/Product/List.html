@@ -1,0 +1,62 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+
+<f:layout name="Default" />
+
+<f:section name="Buttons">
+    <be:moduleLayout.button.linkButton
+        icon="actions-add"
+        title="{f:translate(id: 'LLL:EXT:backend/Resources/Private/Language/locallang_layout.xlf:newRecordGeneral')}"
+        link="{f:uri.action(controller: 'Product', action: 'new')}"
+    />
+</f:section>
+
+
+<f:section name="Content">
+    <h1>Listing for Product</h1>
+
+
+    <f:form action="list" method="post">
+        
+        <input type="text" name="filter[name]" value="{searchName}" placeholder="seach by name">
+        <select name="filter[brand]">
+            <option value="">All Brands</option>
+            <f:for each="{brands}" as="brand">
+                <option value="{brand.uid}" {f:if(condition: brand.uid == selectedBrand, then: 'selected')}>
+                    {brand.name}
+                </option>
+            </f:for>
+        </select>
+
+    <button type="submit">Filter</button>
+
+    </f:form>
+
+    <f:flashMessages />
+
+    <table class="tx_nitsanproduct">
+        <tr>
+            <th><f:translate key="tx_nitsanproduct_domain_model_product.name" /></th>
+            <th><f:translate key="tx_nitsanproduct_domain_model_product.description" /></th>
+            <th><f:translate key="tx_nitsanproduct_domain_model_product.image" /></th>
+            <th><f:translate key="tx_nitsanproduct_domain_model_product.price" /></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <f:for each="{products}" as="product">
+            <tr>
+                <td><f:link.action action="show" arguments="{product: product}">{product.name}</f:link.action></td>
+                <td><f:link.action action="show" arguments="{product: product}">{product.description}</f:link.action></td>
+                <td><f:link.action action="show" arguments="{product: product}">{product.image}</f:link.action></td>
+                <td><f:link.action action="show" arguments="{product: product}">{product.price}</f:link.action></td>
+                <td><f:link.action action="edit" arguments="{product: product}" class="btn btn-default">Edit</f:link.action></td>
+                <td><f:link.action action="delete" arguments="{product: product}" class="btn btn-danger">Delete</f:link.action></td>
+            </tr>
+        </f:for>
+    </table>
+
+    <f:link.action action="new" class="btn btn-default">New Product</f:link.action>
+</f:section>
+</html>

@@ -1,0 +1,16 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Nitsan\NitsanProduct\:
+    resource: '../Classes/*'
+  
+  Nitsan\NitsanProduct\Command\ProductExport:
+    autowire: true
+    public: true 
+    tags:
+     - name: 'console.command'
+       command: 'nitsanproduct:productexport'
+  

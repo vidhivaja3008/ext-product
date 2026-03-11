@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="EXT:nitsan_product/Resources/Private/Language/locallang_csh_tx_nitsanproduct_domain_model_product.xlf" date="2026-03-10T12:49:35Z" product-name="nitsan_product">
+		<header/>
+		<body>
+			<trans-unit id="name.description" resname="name.description">
+				<source>name</source>
+			</trans-unit>
+			<trans-unit id="description.description" resname="description.description">
+				<source>description</source>
+			</trans-unit>
+			<trans-unit id="image.description" resname="image.description">
+				<source>image</source>
+			</trans-unit>
+			<trans-unit id="price.description" resname="price.description">
+				<source>price</source>
+			</trans-unit>
+			<trans-unit id="brands.description" resname="brands.description">
+				<source>brands</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

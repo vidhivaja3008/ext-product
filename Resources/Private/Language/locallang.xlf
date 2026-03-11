@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="EXT:nitsan_product/Resources/Private/Language/locallang.xlf" date="2026-03-10T12:49:35Z" product-name="nitsan_product">
+		<header/>
+		<body>
+			<trans-unit id="tx_nitsanproduct_domain_model_product" resname="tx_nitsanproduct_domain_model_product">
+				<source>Product</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.description" resname="tx_nitsanproduct_domain_model_product.description">
+				<source>Description</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.name" resname="tx_nitsanproduct_domain_model_product.name">
+				<source>Name</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.name.description" resname="tx_nitsanproduct_domain_model_product.name.description">
+				<source>Name</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.description.description" resname="tx_nitsanproduct_domain_model_product.description.description">
+				<source>Description</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.image" resname="tx_nitsanproduct_domain_model_product.image">
+				<source>Image</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.image.description" resname="tx_nitsanproduct_domain_model_product.image.description">
+				<source>Image</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.price" resname="tx_nitsanproduct_domain_model_product.price">
+				<source>Price</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.price.description" resname="tx_nitsanproduct_domain_model_product.price.description">
+				<source>Price</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.brands" resname="tx_nitsanproduct_domain_model_product.brands">
+				<source>Brands</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_product.brands.description" resname="tx_nitsanproduct_domain_model_product.brands.description">
+				<source>Brands</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_brand" resname="tx_nitsanproduct_domain_model_brand">
+				<source>Brand</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_brand.description" resname="tx_nitsanproduct_domain_model_brand.description">
+				<source>Brand</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_brand.name" resname="tx_nitsanproduct_domain_model_brand.name">
+				<source>Name</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_brand.name.description" resname="tx_nitsanproduct_domain_model_brand.name.description">
+				<source>Name</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_brand.image" resname="tx_nitsanproduct_domain_model_brand.image">
+				<source>Image</source>
+			</trans-unit>
+			<trans-unit id="tx_nitsanproduct_domain_model_brand.image.description" resname="tx_nitsanproduct_domain_model_brand.image.description">
+				<source>Image</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

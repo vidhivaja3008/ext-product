@@ -1,0 +1,73 @@
+plugin.tx_nitsanproduct_productdetails {
+    view {
+        templateRootPaths.0 = EXT:nitsan_product/Resources/Private/Templates/
+        templateRootPaths.1 = {$plugin.tx_nitsanproduct_productdetails.view.templateRootPath}
+        partialRootPaths.0 = EXT:nitsan_product/Resources/Private/Partials/
+        partialRootPaths.1 = {$plugin.tx_nitsanproduct_productdetails.view.partialRootPath}
+        layoutRootPaths.0 = EXT:nitsan_product/Resources/Private/Layouts/
+        layoutRootPaths.1 = {$plugin.tx_nitsanproduct_productdetails.view.layoutRootPath}
+    }
+    persistence {
+        storagePid = {$plugin.tx_nitsanproduct_productdetails.persistence.storagePid}
+        #recursive = 1
+    }
+    features {
+        #skipDefaultArguments = 1
+        # if set to 1, the enable fields are ignored in BE context
+        ignoreAllEnableFieldsInBe = 0
+    }
+    mvc {
+        #callDefaultActionIfActionCantBeResolved = 1
+    }
+}
+
+# these classes are only used in auto-generated templates
+plugin.tx_nitsanproduct._CSS_DEFAULT_STYLE (
+    textarea.f3-form-error {
+        background-color: #FF9F9F;
+        border: 1px #FF0000 solid;
+    }
+
+    input.f3-form-error {
+        background-color: #FF9F9F;
+        border: 1px #FF0000 solid;
+    }
+
+    .tx-nitsan-product table {
+        border-collapse: separate;
+        border-spacing: 10px;
+    }
+
+    .tx-nitsan-product table th {
+        font-weight: bold;
+    }
+
+    .tx-nitsan-product table td {
+        vertical-align: top;
+    }
+
+    .typo3-messages .message-error {
+        color: red;
+    }
+
+    .typo3-messages .message-ok {
+        color: green;
+    }
+)
+
+# Module configuration
+module.tx_nitsanproduct_web_nitsanproductproduct {
+    persistence {
+        storagePid = {$module.tx_nitsanproduct_product.persistence.storagePid}
+    }
+    view {
+        templateRootPaths.0 = EXT:nitsan_product/Resources/Private/Backend/Templates/
+        templateRootPaths.1 = {$module.tx_nitsanproduct_product.view.templateRootPath}
+        partialRootPaths.0 = EXT:nitsan_product/Resources/Private/Backend/Partials/
+        partialRootPaths.1 = {$module.tx_nitsanproduct_product.view.partialRootPath}
+        layoutRootPaths.0 = EXT:nitsan_product/Resources/Private/Backend/Layouts/
+        layoutRootPaths.1 = {$module.tx_nitsanproduct_product.view.layoutRootPath}
+    }
+}
+
+page.includeJSFooter.listingJs = EXT:nitsan_product/Resources/Public/Javascript/Listing.js
