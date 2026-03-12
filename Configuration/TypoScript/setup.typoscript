@@ -21,6 +21,44 @@ plugin.tx_nitsanproduct_productdetails {
     }
 }
 
+
+page.includeJSFooter {
+    listingJs = EXT:nitsan_product/Resources/Public/JavaScript/Listing.js
+}
+
+listAction = PAGE
+listAction {
+    typeNum = 941851233551
+    config {
+        disableAllHeaderCode = 1
+        additionalHeaders = Content-type:application/json
+        xhtml_cleaning = 0
+        admPanel = 0
+    }
+
+    10 = USER
+    10 < styles.content.get
+    10 {
+        userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+        extensionName = NitsanProduct
+        pluginName = ProductList
+        vendorName = NITSAN
+        controller = Product
+        switchableControllerActions {
+            Product {
+                1 = list
+            }
+        }
+
+        stdWrap.trim = 1
+        select {
+            where = list_type = "nitsanproduct_productlist"
+        }
+
+        renderObj < tt_content.list.20.nitsanproduct_productlist
+    }
+}
+
 # these classes are only used in auto-generated templates
 plugin.tx_nitsanproduct._CSS_DEFAULT_STYLE (
     textarea.f3-form-error {
@@ -70,4 +108,23 @@ module.tx_nitsanproduct_web_nitsanproductproduct {
     }
 }
 
-page.includeJSFooter.listingJs = EXT:nitsan_product/Resources/Public/Javascript/Listing.js
+manifest = PAGE
+manifest {
+  typeNum = 835
+  config {
+    no_cache = 0
+    sendCacheHeaders = 1
+    debug = 0
+    admPanel = 0
+    disableAllHeaderCode = 1
+    additionalHeaders.10 {
+      header = Content-Type: application/json; charset=utf-8
+      replace = 1
+    }
+  }
+
+  10 = USER
+  10 {
+    userFunc = NITSAN\NitsanProduct\Service\PwaService->render
+  }
+}

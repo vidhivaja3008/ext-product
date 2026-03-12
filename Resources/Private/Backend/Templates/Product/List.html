@@ -5,15 +5,6 @@
 
 <f:layout name="Default" />
 
-<f:section name="Buttons">
-    <be:moduleLayout.button.linkButton
-        icon="actions-add"
-        title="{f:translate(id: 'LLL:EXT:backend/Resources/Private/Language/locallang_layout.xlf:newRecordGeneral')}"
-        link="{f:uri.action(controller: 'Product', action: 'new')}"
-    />
-</f:section>
-
-
 <f:section name="Content">
     <h1>Listing for Product</h1>
 
@@ -56,7 +47,5 @@
             </tr>
         </f:for>
     </table>
-
-    <f:link.action action="new" class="btn btn-default">New Product</f:link.action>
 </f:section>
 </html>

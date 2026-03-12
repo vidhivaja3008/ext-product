@@ -20,7 +20,7 @@ return [
         'iconfile' => 'EXT:nitsan_product/Resources/Public/Icons/tx_nitsanproduct_domain_model_product.gif'
     ],
     'types' => [
-        '1' => ['showitem' => 'name, description, image, price, brands, --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:language, sys_language_uid, l10n_parent, l10n_diffsource, --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:access, hidden, starttime, endtime'],
+        '1' => ['showitem' => 'name, description, image, price, brands,slug, --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:language, sys_language_uid, l10n_parent, l10n_diffsource, --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:access, hidden, starttime, endtime'],
     ],
     'columns' => [
         'sys_language_uid' => [
@@ -150,6 +150,22 @@ return [
                 'maxitems' => 1,
             ],
 
+        ],
+        'slug' => [
+            'exclude' => true,
+            'label' => 'Slug',
+            'config' => [
+                'type' => 'slug',
+                'size' => 50,
+                'generatorOptions' => [
+                    'fields' => ['name'],
+                    'fieldSeparator' => '-',
+                    'prefixParentPageSlug' => true,
+                ],
+                'fallbackCharacter' => '-',
+                'eval' => 'uniqueInSite',
+                'default' => '',
+            ],
         ],
     
     ],

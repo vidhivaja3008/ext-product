@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<T3DataStructure>
+    <sheets>
+        <sDEF>
+            <ROOT>
+                
+                <sheetTitle>Settings</sheetTitle>
+               
+                <type>array</type>
+                <el>
+                    <settings.detailPageId>
+						
+							<label>Products</label>
+							<config>
+								<type>group</type>
+								<internal_type>db</internal_type>
+								<allowed>pages</allowed>
+								<maxitems>1</maxitems>
+							</config>
+					</settings.detailPageId>    
+                </el>
+            </ROOT>
+        </sDEF>
+    </sheets>
+</T3DataStructure>

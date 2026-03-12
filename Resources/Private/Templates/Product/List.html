@@ -2,7 +2,6 @@
 
 <f:layout name="Default" />
 <f:section name="content">
-    <f:asset.script identifier="listing-js" src="EXT:nitsan_product/Resources/Public/Javascript/Listing.js" />
     <h1>Listing for Product</h1>
 
     <f:flashMessages />
@@ -29,24 +28,32 @@
         <f:form.select name="filter[brand]" id="product_brand" options="{brands}" optionValueField="uid" optionLabelField="name" value="{selectedBrand}" prependOptionLabel="All Brands" prependOptionValue=""/>
     </f:form>
 
-
+    
     <br>
     <div id="productResult">
         <table class="tx_nitsanproduct table" border="1">
             <tr>
                 <th><f:translate key="tx_nitsanproduct_domain_model_product.name" /></th>
                 <th><f:translate key="tx_nitsanproduct_domain_model_product.description" /></th>
-                <!-- <th><f:translate key="tx_nitsanproduct_domain_model_product.image" /></th> -->
                 <th><f:translate key="tx_nitsanproduct_domain_model_product.price" /></th>
-                <!-- <th></th>
-                <th></th> -->
+                <th>Edit</th>
             </tr>
             <f:for each="{products}" as="product">
                 <tr>
-                    <td><f:link.action action="show" arguments="{product : product}">{product.name}</f:link.action></td>
-                    <td><f:link.action action="show" arguments="{product : product}">{product.description}</f:link.action></td>
-                    <!-- <td><f:link.action action="show" arguments="{product : product}">{product.image}</f:link.action></td> -->
-                    <td><f:link.action action="show" arguments="{product : product}">{product.price}</f:link.action></td>
+                    <td>
+                        <f:if condition="{settings.detailPageId}">
+                            <f:link.action 
+                                action="show"
+                                pageUid="{settings.detailPageId}"
+                                arguments="{product: product}"
+                                pluginName="Productdetails">
+                                {product.name}
+                            </f:link.action>
+                        </f:if>
+                    </td>
+                    <td><f:link.action action="show" pageUid="{settings.detailPageId}" arguments="{product: product}">{product.description}</f:link.action></td>
+                    <td><f:link.action action="show" pageUid="{settings.detailPageId}" arguments="{product: product}">{product.price}</f:link.action></td>
+                    <td><f:link.action action="edit" pageUid="{settings.editPageId}" arguments="{product : product}">Edit</f:link.action></td>
                     <!-- <td><f:link.action action="edit" arguments="{product : product}">Edit</f:link.action></td>
                     <td><f:link.action action="delete" arguments="{product : product}">Delete</f:link.action></td> -->
                 </tr>
@@ -54,6 +61,6 @@
         </table>
     </div>
 
-    <!-- <f:link.action action="new">New Product</f:link.action> -->
+    <f:link.action action="new" class="mt-2 btn btn-primary">New Product</f:link.action>
 </f:section>
 </html>

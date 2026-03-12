@@ -11,16 +11,12 @@ return [
         'extensionName' => 'NitsanProduct',
         'controllerActions' => [
             \Nitsan\NitsanProduct\Controller\ProductController::class => [
-                'list',
-                'show',
                 'new',
-                'create',
+                'list',
+                'add',
                 'edit',
                 'update',
-                'details',
-                'description',
             ],
-            
         ],
     ],
 ];

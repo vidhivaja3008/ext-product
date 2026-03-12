@@ -1,0 +1,27 @@
+mod {
+    wizards.newContentElement.wizardItems.plugins {
+        elements {
+
+            productlist {
+                iconIdentifier = nitsanproduct-plugin-productlist
+                title = Product List
+                description = Show list of product
+                tt_content_defValues {
+                    CType = list
+                    list_type = nitsanproduct_productlist
+                }
+            }
+
+            productdetails {
+                iconIdentifier = nitsanproduct-plugin-productdetails
+                title = Product Details
+                description = Show details of product
+                tt_content_defValues {
+                    CType = list
+                    list_type = nitsanproduct_productdetails
+                }
+            }
+        }
+        show = *
+    }
+}

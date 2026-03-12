@@ -7,9 +7,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use Symfony\Component\Console\Command\Command;
 use TYPO3\CMS\Core\Resource\StorageRepository;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;  
 use Nitsan\NitsanProduct\Domain\Repository\ProductRepository;
 
 #[AsCommand(
@@ -33,8 +35,26 @@ final class ProductExport extends Command
         $this->productRepository = $productRepository;
     }
 
+    // Add folder name beside the command 
+    // protected function configure():void{
+    //     $this->addArgument(
+    //       'folderName'  ,
+    //       InputArgument::REQUIRED,
+    //        'Folder name where CSV should be stored'
+    //     );
+    // }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // $storageFolderName = $input->getArgument('folderName');
+        // Ask user to enter folder name 
+        $user_input = new SymfonyStyle($input, $output);
+
+        $storageFolderName = $user_input->ask('Enter folder name to save CSV file', 'products_folder');
+
+        // Replace space with _ id user add name with space 
+
+        $storageFolderName = str_replace(' ', '_', trim($storageFolderName));
         $storage = $this->storageRepository->findByUid(1);
 
         if (!$storage) {
@@ -42,14 +62,14 @@ final class ProductExport extends Command
             return Command::FAILURE;
         }
 
-        $storageFolderName = 'products_folder';
-
+        // $storageFolderName = 'products_folder';
+        // Create folder if not exits 
         if (!$storage->hasFolder($storageFolderName)) {
             $storage->createFolder($storageFolderName);
         }
 
         $targetFolder = $storage->getFolder($storageFolderName);
-
+        // get data of products from database
         $produts = $this->productRepository->productDetails();
         
         $data = [

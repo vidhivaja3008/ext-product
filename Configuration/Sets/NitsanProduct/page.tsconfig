@@ -1,0 +1,13 @@
+TCEMAIN.preview {
+    tx_nitsanproduct_domain_model_product {
+        previewPageId = {$nitsanproduct.preview.page}
+        useDefaultLanguageRecord = 0
+        fieldToParameterMap {
+            uid = tx_nitsanproduct[{$nitsanproduct.preview.mode}]
+        }
+        additionalGetParameters {
+            tx_nitsanproduct.controller = Product
+            tx_nitsanproduct.action = list
+        }
+    }
+}

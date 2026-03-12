@@ -2,15 +2,32 @@
 defined('TYPO3') || die();
 
 (static function() {
+
+    // Product List plugin
+
+    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+        'NitsanProduct',
+        'Productlist',
+        [
+            \Nitsan\NitsanProduct\Controller\ProductController::class => 'list,new,create,edit,update'
+        ],
+        // non-cacheable actions
+        [
+            \Nitsan\NitsanProduct\Controller\ProductController::class => 'create,update,delete'
+        ]
+    );
+
+    // Product details plugin 
+
     \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
         'NitsanProduct',
         'Productdetails',
         [
-            \Nitsan\NitsanProduct\Controller\ProductController::class => 'list, show'
+            \Nitsan\NitsanProduct\Controller\ProductController::class => 'show'
         ],
         // non-cacheable actions
         [
-            \Nitsan\NitsanProduct\Controller\ProductController::class => 'list, show'
+            \Nitsan\NitsanProduct\Controller\ProductController::class => 'show'
         ]
     );
 
@@ -19,10 +36,21 @@ defined('TYPO3') || die();
         'mod {
             wizards.newContentElement.wizardItems.plugins {
                 elements {
+
+                    productlist {
+                        iconIdentifier = nitsanproduct-plugin-productlist
+                        title = Product List
+                        description = Show list of product
+                        tt_content_defValues {
+                            CType = list
+                            list_type = nitsanproduct_productlist
+                        }
+                    }
+
                     productdetails {
                         iconIdentifier = nitsanproduct-plugin-productdetails
-                        title = LLL:EXT:nitsanproduct/Resources/Private/Language/locallang_db.xlf:tx_nitsanproduct_productdetails.name
-                        description = LLL:EXT:nitsan_product/Resources/Private/Language/locallang_db.xlf:tx_nitsanproduct_productdetails.description
+                        title = Product Details
+                        description = Show details of product
                         tt_content_defValues {
                             CType = list
                             list_type = nitsanproduct_productdetails

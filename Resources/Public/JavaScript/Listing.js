@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-
     const form = document.getElementById("productFilter");
     const productContainer = document.querySelector("#productResult");
 

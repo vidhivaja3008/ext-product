@@ -3,6 +3,23 @@
 declare(strict_types=1);
 
 namespace Nitsan\NitsanProduct\Controller;
+use TYPO3\CMS\Core\Resource\File;
+use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\DataHandling\SlugHelper;
+use TYPO3\CMS\Core\Resource\FileRepository;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Extbase\Persistence\Repository;
+use Nitsan\NitsanProduct\Domain\Model\Product;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Core\DataHandling\Model\RecordStateFactory;
+use TYPO3\CMS\Core\SysLog\Error as SystemLogErrorClassification;
+use Nitsan\NitsanProduct\Domain\Repository\ProductRepository;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
+use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
+use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnsupportedMethodException;
 
 
 /**
@@ -17,22 +34,21 @@ namespace Nitsan\NitsanProduct\Controller;
 /**
  * ProductController
  */
-class ProductController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class ProductController extends ActionController
 {
-
     /**
      * productRepository
      *
-     * @var \Nitsan\NitsanProduct\Domain\Repository\ProductRepository
+     * @var ProductRepository
      */
     protected $productRepository = null;
 
     protected $brandRepository = null;
 
     /**
-     * @param \Nitsan\NitsanProduct\Domain\Repository\ProductRepository $productRepository
+     * @param ProductRepository $productRepository
      */
-    public function injectProductRepository(\Nitsan\NitsanProduct\Domain\Repository\ProductRepository $productRepository)
+    public function injectProductRepository(ProductRepository $productRepository)
     {
         $this->productRepository = $productRepository;
     }
@@ -41,12 +57,27 @@ class ProductController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->brandRepository = $brandRepository;
     }
 
+    protected $persistenceManager = null;
+    public function injectPersistenceManager(PersistenceManager $persistenceManager): void
+    {
+        $this->persistenceManager = $persistenceManager;
+    }
+
+    public function initializeCreateAction(): void
+    {
+        if ($this->arguments->hasArgument('newProduct')) {
+            $this->arguments->getArgument('newProduct')
+                ->getPropertyMappingConfiguration()
+                ->skipProperties('image');
+        }
+    }
+
     /**
      * action index
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
-    public function indexAction(): \Psr\Http\Message\ResponseInterface
+    public function indexAction(): ResponseInterface
     {
         return $this->htmlResponse();
     }
@@ -54,10 +85,13 @@ class ProductController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     /**
      * action list
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
-    public function listAction(array $filter = []): \Psr\Http\Message\ResponseInterface
+    public function listAction(array $filter = []): ResponseInterface
     {
+        
+        // debug($this->settings);
+        $detailPageId = (int)($this->settings['detailPageId'] ?? 0);
         $name = $filter['name'] ?? null;
         $brand = $filter['brand'] ?? null;
 
@@ -91,11 +125,12 @@ class ProductController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     /**
      * action show
      *
-     * @param \Nitsan\NitsanProduct\Domain\Model\Product $product
-     * @return \Psr\Http\Message\ResponseInterface
+     * @param Product $product
+     * @return ResponseInterface
      */
-    public function showAction(\Nitsan\NitsanProduct\Domain\Model\Product $product): \Psr\Http\Message\ResponseInterface
+    public function showAction(Product $product): ResponseInterface
     {
+        // debug($this->settings);
         $this->view->assign('product', $product);
         return $this->htmlResponse();
     }
@@ -103,59 +138,177 @@ class ProductController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     /**
      * action new
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
-    public function newAction(): \Psr\Http\Message\ResponseInterface
+    public function newAction(): ResponseInterface
     {
+        $brands = $this->brandRepository->findAll();
+        $this->view->assignMultiple([
+            'brands' => $brands
+        ]);
         return $this->htmlResponse();
     }
 
     /**
      * action create
      *
-     * @param \Nitsan\NitsanProduct\Domain\Model\Product $newProduct
+     * @param Product $newProduct
      */
-    public function createAction(\Nitsan\NitsanProduct\Domain\Model\Product $newProduct)
+    public function createAction(Product $newProduct)
     {
-        $this->addFlashMessage('The object was created. Please be aware that this action is publicly accessible unless you implement an access check. See https://docs.typo3.org/p/friendsoftypo3/extension-builder/master/en-us/User/Index.html', '', \TYPO3\CMS\Core\Messaging\AbstractMessage::WARNING);
-        $this->productRepository->add($newProduct);
-        $this->redirect('list');
+        try{
+            $this->productRepository->add($newProduct);
+            $this->persistenceManager->persistAll();
+            try{
+                $slug = $this->createSlug(
+                    'tx_nitsanproduct_domain_model_product',
+                    $newProduct);
+                $newProduct->setSlug($slug);
+                $this->productRepository->update($newProduct);
+            }catch(IllegalObjectTypeException  | UnknownObjectException | UnsupportedMethodException  | Error $exception){
+                $exceptionArray = [
+                    'message' => $exception->getMessage(),
+                    'file' =>  $exception->getFile(),
+                    'line' =>  $exception->getLine()
+                ];
+                $newProduct->setHidden(true);
+                $this->productRepository->update($newProduct);
+               
+            }
+            if($_FILES['tx_nitsanproduct_productlist']['tmp_name']['newProduct']['image']){
+                $newFile = $this->getUploadedFileData($_FILES['tx_nitsanproduct_productlist']['tmp_name']['newProduct']['image'],$_FILES['tx_nitsanproduct_productlist']['name']['newProduct']['image']);
+                $fileData = $newFile->getProperties();
+
+                if($fileData){
+                    $this->productRepository->updateProductImage(
+                        (int)$fileData['uid']  ,
+                        (int)$newProduct->getUid(),
+                        (int)$newProduct->getPid(),
+                        'tx_nitsanproduct_domain_model_product',
+                        'image',
+                    );
+                    $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
+                    $fileObjects  = $fileRepository->findByRelation(
+                        'tx_nitsanproduct_domain_model_product',
+                        'image',
+                        $newProduct->getUid()
+                    );
+                }
+                    
+            }else{
+                
+            }
+        }catch(IllegalObjectTypeException |  Error $exception){
+            
+        }
+
+        
+        
+        return $this->redirect('list');
+    }
+
+    private function createSlug(string $tableName, Product $product): string
+    {
+        $fieldName = 'slug';
+        $fieldConfig = $GLOBALS['TCA'][$tableName]['columns'][$fieldName]['config'] ?? [];
+
+        $recordData = [
+            'uid' => $product->getUid(),
+            'pid' => $product->getPid(),
+            'slug' => $product->getSlug(),
+            'name' => $product->getName()
+        ];
+
+        $state = RecordStateFactory::forName($tableName)
+            ->fromArray($recordData, $product->getPid(), $product->getUid());
+
+        $slugHelper = GeneralUtility::makeInstance(
+            SlugHelper::class,
+            $tableName,
+            $fieldName,
+            $fieldConfig);
+
+        return $product->getSlug() === '' ? $slugHelper->buildSlugForUniqueInTable(
+            str_replace('/', '-', $product->getName()), $state) : $product->getSlug();
     }
 
     /**
      * action edit
      *
-     * @param \Nitsan\NitsanProduct\Domain\Model\Product $product
+     * @param Product $product
      * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("product")
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
-    public function editAction(\Nitsan\NitsanProduct\Domain\Model\Product $product): \Psr\Http\Message\ResponseInterface
+    public function editAction(Product $product): ResponseInterface
     {
-        $this->view->assign('product', $product);
+        $brands = $this->brandRepository->findAll();
+        $this->view->assignMultiple([
+            'product' => $product,
+            'brands' => $brands
+        ]);
         return $this->htmlResponse();
     }
 
     /**
      * action update
      *
-     * @param \Nitsan\NitsanProduct\Domain\Model\Product $product
+     * @param Product $product
      */
-    public function updateAction(\Nitsan\NitsanProduct\Domain\Model\Product $product)
+
+    public function initializeUpdateAction(): void
     {
-        $this->addFlashMessage('The object was updated. Please be aware that this action is publicly accessible unless you implement an access check. See https://docs.typo3.org/p/friendsoftypo3/extension-builder/master/en-us/User/Index.html', '', \TYPO3\CMS\Core\Messaging\AbstractMessage::WARNING);
-        $this->productRepository->update($product);
-        $this->redirect('list');
+        if ($this->arguments->hasArgument('product')) {
+            $this->arguments->getArgument('product')
+                ->getPropertyMappingConfiguration()
+                ->skipProperties('image');
+        }
     }
+    public function updateAction(Product $product)
+    {
+        if (isset($_FILES['tx_nitsanproduct_productlist']['error']['product']['image']) &&
+            $_FILES['tx_nitsanproduct_productlist']['error']['product']['image'] === 0
+        ) {
+                
+            $newFile = $this->getUploadedFileData($_FILES['tx_nitsanproduct_productlist']['tmp_name']['product']['image'], $_FILES['tx_nitsanproduct_productlist']['name']['product']['image']);
+            $fileData = $newFile->getProperties();
+
+            if ($fileData) {
+                $this->productRepository->updateProductImage(
+                    (int)$fileData['uid'],
+                    (int)$product->getUid(),
+                    (int)$product->getPid(),
+                    'tx_nitsanproduct_domain_model_product',
+                    'image'
+                );
+                $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
+                $fileObjects = $fileRepository->findByRelation(
+                    'tx_nitsanproduct_domain_model_product',
+                    'image',
+                    $product->getUid()
+                );
+            }
+        }
+        $this->productRepository->update($product);
+        return $this->redirect('list');
+}
 
     /**
      * action delete
      *
-     * @param \Nitsan\NitsanProduct\Domain\Model\Product $product
+     * @param Product $product
      */
-    public function deleteAction(\Nitsan\NitsanProduct\Domain\Model\Product $product)
+    public function deleteAction(Product $product)
     {
-        $this->addFlashMessage('The object was deleted. Please be aware that this action is publicly accessible unless you implement an access check. See https://docs.typo3.org/p/friendsoftypo3/extension-builder/master/en-us/User/Index.html', '', \TYPO3\CMS\Core\Messaging\AbstractMessage::WARNING);
+        $this->addFlashMessage('The object was deleted. Please be aware that this action is publicly accessible unless you implement an access check. See https://docs.typo3.org/p/friendsoftypo3/extension-builder/master/en-us/User/Index.html', '', AbstractMessage::WARNING);
         $this->productRepository->remove($product);
         $this->redirect('list');
+    }
+
+    private function getUploadedFileData(string $tmpName,string $fileName):File {
+        $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
+        $storage = $resourceFactory->getDefaultStorage();
+        $folderPath = $storage->getRootLevelFolder();
+        $newFile = $storage->addFile($tmpName,$folderPath,$fileName);
+        return $newFile;
     }
 }

@@ -48,13 +48,19 @@ class Product extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      */
     protected $price = null;
 
+     protected string $slug = '';
+
+    protected bool $hidden = false;
+
+    protected $brands = null;
+
     /**
      * brands
      *
      * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Nitsan\NitsanProduct\Domain\Model\Brand>
      * @TYPO3\CMS\Extbase\Annotation\ORM\Cascade("remove")
      */
-    protected $brands = null;
+    
 
     /**
      * __construct
@@ -204,5 +210,42 @@ class Product extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     public function setBrands(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $brands)
     {
         $this->brands = $brands;
+    }
+
+    /**
+     * Returns the slug
+     *
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Sets the slug
+     *
+     * @param string $slug
+     * @return void
+     */
+    public function setSlug(string $slug): void
+    {
+        $this->slug = $slug;
+    }
+
+        /**
+     * @param bool $hidden
+     */
+    public function setHidden($hidden): void
+    {
+        $this->hidden = $hidden;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getHidden(): bool
+    {
+        return $this->hidden;
     }
 }

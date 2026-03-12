@@ -8,9 +8,9 @@
 
     <f:render partial="FormErrors" />
 
-    <f:form action="update" name="product" object="{product}" >
-    <f:render partial="Product/FormFields" arguments="{product:product}" />
-    <f:form.submit value="Save" />
+    <f:form action="update" name="product" object="{product}" enctype="multipart/form-data">
+    <f:render partial="Product/FormFields" arguments="{_all}"/>
+    <f:form.submit value="Update" />
     </f:form>
 </f:section>
 </html>
