@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Nitsan\NitsanProduct\Domain\Repository;
 
+use PDO;
+use Doctrine\DBAL\ParameterType;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Extbase\Persistence\Repository;
@@ -35,24 +37,33 @@ class ProductRepository extends Repository
         $this->connectionPool = $connectionPool;
         parent::__construct();
     }
+    public function initializeObject(): void
+    {
+        $querySettings = $this->createQuery()->getQuerySettings();
+        $querySettings->setRespectStoragePage(false);
+    }
 
-    public function findByFilter($brand = null, $name= null){
+    public function findByFilter($brand = null, $name = null)
+    {
         $query = $this->createQuery();
-
         $constraints = [];
 
-        if($brand){
-            $constraints[] = $query->equals('brands',$brand);
-        }
-        if($name){
-            $constraints[] = $query->like('name','%'. $name .'%');
+        if ($brand) {
+            $constraints[] = $query->equals('brands.uid', (int)$brand->getUid());
         }
 
-        if(!empty($constraints)){
+        if ($name) {
+            $constraints[] = $query->like('name', '%' . $name . '%');
+        }
+
+        if (count($constraints) === 1) {
+            $query->matching($constraints[0]);
+        } elseif (count($constraints) > 1) {
             $query->matching(
                 $query->logicalAnd(...$constraints)
             );
         }
+
         return $query->execute();
     }
 
@@ -73,39 +84,43 @@ class ProductRepository extends Repository
 
     }
 
-    public function updateProductImage(int $uid_local , int $uid_foregin , int $pid , string $table , string $field){
-        $tableConnection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_file_reference');
-        $sysFileRefData[$uid_foregin] = [
-            'uid_local' => $uid_local,
-            'uid_foreign' => $uid_foregin,
-            'tablenames' => $table,
-            'fieldname' => $field,
-            'sorting_foreign' => 1,
-            'pid' => $pid
-        ];
+  public function updateProductImage(
+                int $fileUid,
+                int $productUid,
+                int $pid,
+                string $table,
+                string $field
+            ): void {
 
-        if(!empty($sysFileRefData)){
-            $tableConnection->bulkInsert('sys_file_reference',array_values($sysFileRefData),[
-            'uid_local',
-            'uid_foreign',
-            'tablenames',
-            'fieldname',
-            'sorting_foreign',
-            'pid']);
-        }
+                $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+                    ->getConnectionForTable('sys_file_reference');
 
-        $count = $this->getRefrenceImageCounts($uid_local, $uid_foregin, $field, $table);
+                // Step 1: Remove old image relation
+                $connection->delete(
+                    'sys_file_reference',
+                    [
+                        'uid_foreign' => $productUid,
+                        'tablenames'  => $table,
+                        'fieldname'   => $field
+                    ]
+                );
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $queryBuilder
-            ->update($table)
-            ->where(
-                $queryBuilder->expr()->eq('uid',
-                    $queryBuilder->createNamedParameter('ADMIN')))
-            ->set($field, $count)
-            ->executeQuery();
-
-        
+                // Step 2: Insert new relation
+                $connection->insert(
+                    'sys_file_reference',
+                    [
+                        'uid_local'        => $fileUid,
+                        'uid_foreign'      => $productUid,
+                        'tablenames'       => $table,
+                        'fieldname'        => $field,
+                        'pid'              => $pid,
+                        'sorting_foreign'  => 1,
+                        'tstamp'           => time(),
+                        'crdate'           => time(),
+                        'deleted'          => 0,
+                        'hidden'           => 0
+                    ]
+                );
     }
 
     public function getRefrenceImageCounts($ref, $uid_foreign, $field, $table)
@@ -116,10 +131,10 @@ class ProductRepository extends Repository
             ->select('*')
             ->from('sys_file_reference')
             ->where(
-                $queryBuilder->expr()->eq('uid_foreign', $queryBuilder->createNamedParameter('ADMIN')),
+                $queryBuilder->expr()->eq('uid_foreign', $queryBuilder->createNamedParameter($uid_foreign, ParameterType::INTEGER)),
                 $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter($table)),
                 $queryBuilder->expr()->eq('fieldname', $queryBuilder->createNamedParameter($field)),
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter('ADMIN'))
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, ParameterType::INTEGER))
             )
             ->executeQuery()
             ->fetchAllAssociative();

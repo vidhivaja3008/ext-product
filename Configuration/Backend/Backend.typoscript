@@ -1,0 +1,15 @@
+module.tx_nitsanproduct {
+    view {
+        templateRootPaths {
+            0 = EXT:nitsan_product/Resources/Private/Backend/Templates/
+        }
+
+        layoutRootPaths {
+            0 = EXT:nitsan_product/Resources/Private/Backend/Layouts/
+        }
+
+        partialRootPaths {
+            0 = EXT:nitsan_product/Resources/Private/Backend/Partials/
+        }
+    }
+}

@@ -10,7 +10,12 @@
 	</tr>
 	<tr>
 		<td><f:translate key="tx_nitsanproduct_domain_model_product.image" /></td>
-		<td>{product.image}</td>
+		<td>
+			<f:if condition="{product.image}">
+				<f:image image="{product.image}" width="300" />
+			</f:if>
+			
+		</td>
 	</tr>
 	<tr>
 		<td><f:translate key="tx_nitsanproduct_domain_model_product.price" /></td>

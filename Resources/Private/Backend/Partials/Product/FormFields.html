@@ -1,18 +1,43 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
-<label for="name">
-	<f:translate key="tx_nitsanproduct_domain_model_product.name" />
-</label><br />
-	<f:form.textfield property="name" id="name" /><br />
-<label for="description">
-	<f:translate key="tx_nitsanproduct_domain_model_product.description" />
-</label><br />
-	<f:form.textarea property="description" id="description" cols="40" rows="15" /><br />
-<label for="image">
-	<f:translate key="tx_nitsanproduct_domain_model_product.image" />
-</label><br />
-	<f:form.textfield property="image" id="image" /><br />
-<label for="price">
-	<f:translate key="tx_nitsanproduct_domain_model_product.price" />
-</label><br />
-	<f:form.textfield property="price" id="price" /><br />
+
+	<!-- Name filed--->
+
+	<label for="name">
+		<f:translate key="tx_nitsanproduct_domain_model_product.name" />
+	</label>
+	<br />
+		<f:form.textfield property="name" id="name" class="form-control" /><br />
+	
+	<!-- Description filed--->
+	<label for="description">
+		<f:translate key="tx_nitsanproduct_domain_model_product.description" />
+	</label>
+	<br />
+		<f:form.textarea property="description" id="description" cols="40" rows="15" class="form-control" /><br />
+	
+	<!-- Image filed--->
+	<label for="image">
+		<f:translate key="tx_nitsanproduct_domain_model_product.image" />
+	</label>
+	<br />
+	<f:if condition="{products.image}">
+        <f:for each="{products.image}" as="image">
+            <f:image image="{image}" width="200"/>
+        </f:for>
+    </f:if>
+	<f:form.upload property="image" id="product_images" name="image" class="form-control" /><br />
+	<label for="price">
+		<f:translate key="tx_nitsanproduct_domain_model_product.price" />
+	</label>
+	<br />
+	<f:form.textfield property="price" id="price" class="form-control" /><br />
+		<label>Brand</label>
+		<f:debug>{brands}</f:debug>
+		<f:form.select
+			property="brands"
+			options="{brands}"
+			optionLabelField="name"
+			optionValueField="uid"
+			class="form-control"
+		/>
 </html>

@@ -22,7 +22,7 @@
 
     <!-- simple filter form end -->
 
-    <f:form id="productFilter" action="list" method="post">
+    <f:form id="productFilter" action="list" method="post" arguments="{filter: filter}">
         <f:form.textfield name="filter[name]" value="{searchName}" id="product_name" placeholder="Search by name" />
 
         <f:form.select name="filter[brand]" id="product_brand" options="{brands}" optionValueField="uid" optionLabelField="name" value="{selectedBrand}" prependOptionLabel="All Brands" prependOptionValue=""/>
@@ -51,8 +51,12 @@
                             </f:link.action>
                         </f:if>
                     </td>
-                    <td><f:link.action action="show" pageUid="{settings.detailPageId}" arguments="{product: product}">{product.description}</f:link.action></td>
-                    <td><f:link.action action="show" pageUid="{settings.detailPageId}" arguments="{product: product}">{product.price}</f:link.action></td>
+                    <td>
+                        <f:link.action action="show" pageUid="{settings.detailPageId}" arguments="{product: product}" pluginName="Productdetails">{product.description}</f:link.action>
+                    </td>
+                    <td>
+                        <f:link.action action="show" pageUid="{settings.detailPageId}" arguments="{product: product}" pluginName="Productdetails">{product.price}</f:link.action>
+                    </td>
                     <td><f:link.action action="edit" pageUid="{settings.editPageId}" arguments="{product : product}">Edit</f:link.action></td>
                     <!-- <td><f:link.action action="edit" arguments="{product : product}">Edit</f:link.action></td>
                     <td><f:link.action action="delete" arguments="{product : product}">Delete</f:link.action></td> -->

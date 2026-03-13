@@ -139,18 +139,16 @@ return [
             ],
         ],
         'brands' => [
-            'exclude' => true,
-            'label' => 'LLL:EXT:nitsan_product/Resources/Private/Language/locallang_db.xlf:tx_nitsanproduct_domain_model_product.brands',
-            'description' => 'LLL:EXT:nitsan_product/Resources/Private/Language/locallang_db.xlf:tx_nitsanproduct_domain_model_product.brands.description',
-            'config' => [
-                'type' => 'select',
-                'renderType' => 'selectSingle',
-                'foreign_table' => 'tx_nitsanproduct_domain_model_brand',
-                'minitems' => 0,
-                'maxitems' => 1,
-            ],
-
+        'exclude' => true,
+        'label' => 'Brand',
+        'config' => [
+            'type' => 'select',
+            'renderType' => 'selectSingle',
+            'foreign_table' => 'tx_nitsanproduct_domain_model_brand',
+            'minitems' => 0,
+            'maxitems' => 1,
         ],
+    ],
         'slug' => [
             'exclude' => true,
             'label' => 'Slug',

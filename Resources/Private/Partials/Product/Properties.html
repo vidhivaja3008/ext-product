@@ -11,7 +11,9 @@
 	<tr>
 		<td><f:translate key="tx_nitsanproduct_domain_model_product.image" /></td>
 		<td>
-			<f:image image="{product.image}" class="product-image" height="250" />
+			<f:if condition="{product.image}">
+				<f:image image="{product.image}" width="300" />
+			</f:if>
 		</td>
 	</tr>
 	<tr>

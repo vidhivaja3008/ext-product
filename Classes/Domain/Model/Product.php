@@ -52,7 +52,7 @@ class Product extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 
     protected bool $hidden = false;
 
-    protected $brands = null;
+
 
     /**
      * brands
@@ -170,49 +170,6 @@ class Product extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     }
 
     /**
-     * Adds a Brand
-     *
-     * @param \Nitsan\NitsanProduct\Domain\Model\Brand $brand
-     * @return void
-     */
-    public function addBrand(\Nitsan\NitsanProduct\Domain\Model\Brand $brand)
-    {
-        $this->brands->attach($brand);
-    }
-
-    /**
-     * Removes a Brand
-     *
-     * @param \Nitsan\NitsanProduct\Domain\Model\Brand $brandToRemove The Brand to be removed
-     * @return void
-     */
-    public function removeBrand(\Nitsan\NitsanProduct\Domain\Model\Brand $brandToRemove)
-    {
-        $this->brands->detach($brandToRemove);
-    }
-
-    /**
-     * Returns the brands
-     *
-     * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Nitsan\NitsanProduct\Domain\Model\Brand>
-     */
-    public function getBrands()
-    {
-        return $this->brands;
-    }
-
-    /**
-     * Sets the brands
-     *
-     * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Nitsan\NitsanProduct\Domain\Model\Brand> $brands
-     * @return void
-     */
-    public function setBrands(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $brands)
-    {
-        $this->brands = $brands;
-    }
-
-    /**
      * Returns the slug
      *
      * @return string
@@ -247,5 +204,26 @@ class Product extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     public function getHidden(): bool
     {
         return $this->hidden;
+    }
+
+    /**
+     * @var \Nitsan\NitsanProduct\Domain\Model\Brand
+     */
+    protected $brands = null;
+
+    /**
+     * @return \Nitsan\NitsanProduct\Domain\Model\Brand|null
+     */
+    public function getBrands()
+    {
+        return $this->brands;
+    }
+
+    /**
+     * @param \Nitsan\NitsanProduct\Domain\Model\Brand $brands
+     */
+    public function setBrands(\Nitsan\NitsanProduct\Domain\Model\Brand $brands)
+    {
+        $this->brands = $brands;
     }
 }

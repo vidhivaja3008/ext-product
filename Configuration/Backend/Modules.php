@@ -1,5 +1,4 @@
 <?php
-
 return [
     'web_nitsan_product' => [
         'parent' => 'web',
@@ -11,9 +10,10 @@ return [
         'extensionName' => 'NitsanProduct',
         'controllerActions' => [
             \Nitsan\NitsanProduct\Controller\ProductController::class => [
-                'new',
                 'list',
-                'add',
+                'show',
+                'new',
+                'create',
                 'edit',
                 'update',
             ],

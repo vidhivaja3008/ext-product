@@ -17,6 +17,7 @@ use TYPO3\CMS\Core\DataHandling\Model\RecordStateFactory;
 use TYPO3\CMS\Core\SysLog\Error as SystemLogErrorClassification;
 use Nitsan\NitsanProduct\Domain\Repository\ProductRepository;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Persistence\Generic\QuerySettingsInterface;
 use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnsupportedMethodException;
@@ -55,6 +56,8 @@ class ProductController extends ActionController
 
     public function injectBrandRepository(\Nitsan\NitsanProduct\Domain\Repository\BrandRepository $brandRepository){
         $this->brandRepository = $brandRepository;
+
+        
     }
 
     protected $persistenceManager = null;
@@ -156,6 +159,7 @@ class ProductController extends ActionController
      */
     public function createAction(Product $newProduct)
     {
+    
         try{
             $this->productRepository->add($newProduct);
             $this->persistenceManager->persistAll();
@@ -173,30 +177,60 @@ class ProductController extends ActionController
                 ];
                 $newProduct->setHidden(true);
                 $this->productRepository->update($newProduct);
-               
+            
             }
-            if($_FILES['tx_nitsanproduct_productlist']['tmp_name']['newProduct']['image']){
-                $newFile = $this->getUploadedFileData($_FILES['tx_nitsanproduct_productlist']['tmp_name']['newProduct']['image'],$_FILES['tx_nitsanproduct_productlist']['name']['newProduct']['image']);
-                $fileData = $newFile->getProperties();
+            if (!empty($_FILES)) {
 
-                if($fileData){
-                    $this->productRepository->updateProductImage(
-                        (int)$fileData['uid']  ,
-                        (int)$newProduct->getUid(),
-                        (int)$newProduct->getPid(),
-                        'tx_nitsanproduct_domain_model_product',
-                        'image',
-                    );
-                    $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
-                    $fileObjects  = $fileRepository->findByRelation(
-                        'tx_nitsanproduct_domain_model_product',
-                        'image',
-                        $newProduct->getUid()
-                    );
+                $tmpFile = null;
+                $fileName = null;
+
+                /**
+                 * Frontend plugin structure
+                 */
+                if (
+                    isset($_FILES['tx_nitsanproduct_productlist']['tmp_name']['newProduct']['image']) &&
+                    $_FILES['tx_nitsanproduct_productlist']['error']['newProduct']['image'] === 0
+                ) {
+
+                    $tmpFile = $_FILES['tx_nitsanproduct_productlist']['tmp_name']['newProduct']['image'];
+                    $fileName = $_FILES['tx_nitsanproduct_productlist']['name']['newProduct']['image'];
                 }
-                    
-            }else{
-                
+
+                /**
+                 * Backend module structure
+                 */
+                elseif (
+                    isset($_FILES['newProduct']['tmp_name']['image']) &&
+                    $_FILES['newProduct']['error']['image'] === 0
+                ) {
+
+                    $tmpFile = $_FILES['newProduct']['tmp_name']['image'];
+                    $fileName = $_FILES['newProduct']['name']['image'];
+                }
+
+                /**
+                 * Upload file if available
+                 */
+                if ($tmpFile && $fileName) {
+
+                    $newFile = $this->getUploadedFileData($tmpFile, $fileName);
+
+                    if ($newFile) {
+
+                        $fileData = $newFile->getProperties();
+
+                        if (!empty($fileData['uid'])) {
+
+                            $this->productRepository->updateProductImage(
+                                (int)$fileData['uid'],
+                                (int)$newProduct->getUid(),
+                                (int)$newProduct->getPid(),
+                                'tx_nitsanproduct_domain_model_product',
+                                'image'
+                            );
+                        }
+                    }
+                }
             }
         }catch(IllegalObjectTypeException |  Error $exception){
             
@@ -265,29 +299,59 @@ class ProductController extends ActionController
     }
     public function updateAction(Product $product)
     {
-        if (isset($_FILES['tx_nitsanproduct_productlist']['error']['product']['image']) &&
-            $_FILES['tx_nitsanproduct_productlist']['error']['product']['image'] === 0
-        ) {
-                
-            $newFile = $this->getUploadedFileData($_FILES['tx_nitsanproduct_productlist']['tmp_name']['product']['image'], $_FILES['tx_nitsanproduct_productlist']['name']['product']['image']);
-            $fileData = $newFile->getProperties();
+        if (!empty($_FILES)) {
 
-            if ($fileData) {
-                $this->productRepository->updateProductImage(
-                    (int)$fileData['uid'],
-                    (int)$product->getUid(),
-                    (int)$product->getPid(),
-                    'tx_nitsanproduct_domain_model_product',
-                    'image'
-                );
-                $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
-                $fileObjects = $fileRepository->findByRelation(
-                    'tx_nitsanproduct_domain_model_product',
-                    'image',
-                    $product->getUid()
-                );
+                $tmpFile = null;
+                $fileName = null;
+
+                /**
+                 * Frontend plugin structure
+                 */
+                if (
+                    isset($_FILES['tx_nitsanproduct_productlist']['tmp_name']['product']['image']) &&
+                    $_FILES['tx_nitsanproduct_productlist']['error']['product']['image'] === 0
+                ) {
+
+                    $tmpFile = $_FILES['tx_nitsanproduct_productlist']['tmp_name']['product']['image'];
+                    $fileName = $_FILES['tx_nitsanproduct_productlist']['name']['product']['image'];
+                }
+
+                /**
+                 * Backend module structure
+                 */
+                elseif (
+                    isset($_FILES['product']['tmp_name']['image']) &&
+                    $_FILES['product']['error']['image'] === 0
+                ) {
+
+                    $tmpFile = $_FILES['product']['tmp_name']['image'];
+                    $fileName = $_FILES['product']['name']['image'];
+                }
+
+                /**
+                 * Upload file if available
+                 */
+                if ($tmpFile && $fileName) {
+
+                    $newFile = $this->getUploadedFileData($tmpFile, $fileName);
+
+                    if ($newFile) {
+
+                        $fileData = $newFile->getProperties();
+
+                        if (!empty($fileData['uid'])) {
+
+                            $this->productRepository->updateProductImage(
+                                (int)$fileData['uid'],
+                                (int)$product->getUid(),
+                                (int)$product->getPid(),
+                                'tx_nitsanproduct_domain_model_product',
+                                'image'
+                            );
+                        }
+                    }
+                }
             }
-        }
         $this->productRepository->update($product);
         return $this->redirect('list');
 }
